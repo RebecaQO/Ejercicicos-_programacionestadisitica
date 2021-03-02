@@ -1,0 +1,59 @@
+---
+title: "Ejecicio"
+author: "RQO"
+date: "2/3/2021"
+output: html_document
+---
+
+```{r}
+# LA SUMA DE NUMEROS PARES
+sumapares<-function(x){
+ a=sum(x[x%%2==0])
+print(a)}
+# LA SUMA DE NUMEROS 
+suma1<-function(x){
+ a=sum(x)
+print(a) }
+#COEFICIENTE DE VARIACION DEL VECTOR
+CoeficienteDeVariacion<-function(x){
+  n=length(x)
+   x1=sum(x)/n
+   X2=x**2
+   s2=(sum(X2)-(n*(x1**2)))/(n-1)
+   D=s2**(1/2)
+   CV=(D/x1)*100
+   o=coeficienteVar(x)
+   print(o)
+   print(CV)
+}
+
+xx<-c(1,2,2,2,6,5)
+a<-sumapares(xx)
+b=suma1(xx)
+c=CoeficienteDeVariacion(xx)# LA SUMA DE NUMEROS PARES
+sumapares<-function(x){
+ a=sum(x[x%%2==0])
+print(a)}
+# LA SUMA DE NUMEROS 
+suma1<-function(x){
+ a=sum(x)
+print(a) }
+#COEFICIENTE DE VARIACION DEL VECTOR
+CoeficienteDeVariacion<-function(x){
+  n=length(x)
+   x1=sum(x)/n
+   X2=x**2
+   s2=(sum(X2)-(n*(x1**2)))/(n-1)
+   D=s2**(1/2)
+   CV=(D/x1)*100
+   o=coeficienteVar(x)
+   print(o)
+   print(CV)
+}
+
+xx<-c(1,2,2,2,6,5)
+a<-sumapares(xx)
+b=suma1(xx)
+c=CoeficienteDeVariacion(xx)v0
+```
+
