@@ -1,0 +1,90 @@
+---
+title: "clase 11 de marzo"
+author: "RQO"
+date: "11/3/2021"
+output: html_document
+---
+```{r}
+rm(list=ls())
+library(dplyr)
+load(url("https://github.com/AlvaroLimber/EST-383/raw/master/data/eh19.RData"))
+#jefe/jefa
+aux<-unique(eh19p$s02a_05)
+bdj<-eh19p %>% filter(s02a_05==aux[1])
+#selección de variables para el/la jefa/jefa 
+bdj<-bdj %>% select(folio,depto,area,s02a_02,s02a_03,s02a_10,p0, pext0, niv_ed, niv_ed_g, aestudio)
+#selección de variables para la vivienda
+bdv<-eh19v %>% select(folio,s01a_06,s01a_08,s01a_09,s01a_10,s01a_15,s01a_16)
+# unir las bases de datos, 
+bdj<-merge(bdj,bdv,"folio")
+
+```
+##estadistica descriptiva
+```{r}
+t1<-table(bdj$depto)
+t2<-prop.table(t1)*100
+t3=cumsum(t1)
+tabla1<-cbind(t1,t3,t2)
+tabla1
+barplot(t1)
+#tablade contigencia
+t4<-table(bdj$depto,bdj$s02a_02)
+t5<-prop.table(t4)
+sum(t5)
+t6<-prop.table(t4,1)*100 #fila
+t7<-prop.table(t4,2)*100p
+t8=addmargins(t4)
+addmargins(t4,1)
+addmargins(t4,2)
+colnames(t8)[3]<-"total"
+rownames(t8)[10]<-"total"
+install.packages("xtable")
+library(xtable)
+xtable(t8)
+library(knitr)
+kable(t8)
+mean(bdj$s02a_03)
+median(bdj$s02a_03)
+#media y mediana de edad por depatamento y sexo
+bdj %>% group_by(Departamento=depto,Sexo=s02a_02) %>% summarise(media=mean(s02a_03),Mediana=median(s02a_03)) #ctrl ship m 
+install.packages("survey")
+load(url("https://github.com/AlvaroLimber/EST-383/raw/master/data/eh19.RData"))
+install.packages("svryr")
+library(survey)
+sd1=svydesign(ids=< ~upm, strata= ~estrato,weights= ~factor, data=eh19p)
+r=svymean(~sO2a_0,design=sd1,deff=T)
+svy
+```
+
+```{r}
+library("ggplot2")
+load(url("https://github.com/AlvaroLimber/EST-383/raw/master/data/eh19.RData"))
+set.seed(1424)
+s=sample(1:39605,2000)
+bd=eh19p[s,]
+ggplot(bd,aes(s02a_03))+geom_histogram
+ggplot(bd,aes(s02a_03))+geom_boxplot()
+ggplot(bd,aes(s02a_03,log(ylab),shape=s02a_02,colour=area,size=ynolab))+geom_point()+geom_smooth()
+ggplot(bd,aes(s02a_03,log(ylab))+geom_boxplot()+geom_smooth(method ="lm")
+ggplot(bd,aes(s02a_03,log(ylab),shape=s02a_02,colour=area,size=ynolab))+geom_point()+facet_wrap(~depto+p0)
+ggplot(bd,aes(ylab,depto))+geom_violin()+facet_wrap(~area)
+ggplot(bd,aes(depto,log(ylab)))+geom_jitter()
+g1<-ggplot(bd,aes(depto))+geom_bar(alpha=0.8)+ggtitle("departamento")+xlab("departamento")
+g1+ylab("Frecuencia")+ylim(0,1000)
+pdf("g1.pdf")
+g1+ylab("Frecuencia")+ylim(0,1000)
+
+dev.off()
+g1+ylab("Frecuencia")+ylim(0,1000)+theme_gray()
+g1+ylab("Frecuencia")+ylim(0,1000)+theme_bw()
+g1+ylab("Frecuencia")+ylim(0,1000)+theme_dark()
+g1+ylab("Frecuencia")+ylim(0,1000)+theme_minimal()
+
+```
+##Flexdashboard
+```{r}
+install.packages("flexdashboard")
+library(flexdashboard)
+```
+
+
