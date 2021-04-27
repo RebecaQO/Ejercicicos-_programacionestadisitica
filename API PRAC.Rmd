@@ -1,0 +1,112 @@
+---
+title: "Tarea API"
+author: "Rebeca Quispe"
+date: "26/4/2021"
+output: html_document
+---
+# EJERCIO 1
+1. Usando la Api del banco mundial elija un indicador 3 países y un período de tiempo, descargue la base de datos y realice un gráfico en ggplot
+
+Para la grafica utilizamos el indicador de proporcion de jovenes entre 15 a 18 años
+que:
+*ni estudian ,ni trabajan
+*solo estudian
+*estudian y trabajan
+* solo trabajan 
+De los paises de Bolivia,Peru, Argentina en los años 2011 hasta el 2014
+```{r}
+
+library(wbstats)
+library(dplyr)
+library(ggplot2)
+library(ggvis)
+library(maps)
+index_edu=wb_search(pattern ="education" )
+#proporcion de jovenes que no trabajan,y ni estudian
+t1=wb_data(country=c("BOL","ARG","PER"), indicator = "4.0.nini.15a18",start_date = 2011,end_date = 2014)
+t1=t1%>%rename(proporcion="4.0.nini.15a18")%>%select(country,date,proporcion)%>% mutate(tipo="ni estudia ni trabaja")
+
+#proporcion de jovenes que solo estudian
+t2=wb_data(country =c("BOL","ARG","PER"), indicator = "4.0.stud.15a18",start_date = 2011,end_date = 2014)
+
+t2=t2%>%rename(proporcion="4.0.stud.15a18")%>%select(country,date,proporcion)%>% mutate(tipo="solo estudia")
+#proporcion de jovenes que estudian y trabajan
+t3=wb_data(country =c("BOL","ARG","PER"), indicator = "4.0.studwork.15a18",start_date = 2011,end_date = 2014)
+t3=t3%>%rename(proporcion="4.0.studwork.15a18")%>%select(country,date,proporcion)%>% mutate(tipo="estudia y trabaja")
+#proporcion de jovenes que trabajan
+t4=wb_data(country = c("BOL","ARG","PER"), indicator = "4.0.work.15a18",start_date = 2011,end_date = 2014)
+t4=t4%>%rename(proporcion="4.0.work.15a18")%>%select(country,date,proporcion)%>% mutate(tipo="solo trabaja")
+bd<-rbind(t1,t2,t3,t4)
+bd=bd%>%rename(Pais="country",Año="date")
+bd=bd%>%group_by(Año)
+
+ggplot(bd,aes(tipo,proporcion,colour=Pais,fill=Pais))+geom_bar(position="dodge",stat="identity")+facet_grid(Año~.)+ylim(0,1)
+
+       
+```
+
+# EJERCICIO 2
+2. Elija una librería de R sobre API (no vista en clases) desarrolle un ejemplo de uso en un .rmd . Descarga, comandos, autentificación, salida tipo tabla y gráfico
+
+## Spotifyr:
+spotifyr  permite extraer funciones de audio de pistas y otras funciones de la API de Spotify
+
+### Autentificacion
+Siga los siguientes pasos
+
+* Vaya a https://developer.spotify.com/dashboard/applications.
+
+* Inicie sesión con su cuenta de Spotify.
+
+* Haga clic en "Crear una aplicación".
+
+* Elija un "Nombre de la aplicación" y una "Descripción de la aplicación" de su elección y marque las casillas de verificación.
+
+* Después de la creación, verá su "ID de cliente" y puede hacer clic en "Mostrar secreto de cliente" para mostrar su "Secreto de cliente".
+
+
+
+```{r}
+#install.packages("spotifyr")
+library(devtools)
+devtools::install_github("charlie86/spotifyr")
+library(spotifyr)
+Sys.setenv(SPOTIFY_CLIENT_ID = "9e863bdc9377459b92c18f6dfa924332")
+Sys.setenv(SPOTIFY_CLIENT_SECRET ="960c16acef734711b4c9ee229fa8fd31" )
+access_token <- get_spotify_access_token()
+```
+
+### Comandos
+* Get Spotify Access Token:esta funcion crea un acceso a Spotify
+* get_artist_audio_features:obtiene la informacion de las canciones en su  totalidad o parte de la discografía de un artista
+*get_category_playlists:Obtiene una   lista de listas de reproducción (Playlist) de Spotify etiquetadas con una categoría en particular.
+
+```{r}
+
+library(dplyr)
+library(spotifyr)
+library(ggplot2)
+library(lubridate)
+library(spotifyr)
+
+Sys.setenv(SPOTIFY_CLIENT_ID = "9e863bdc9377459b92c18f6dfa924332")
+Sys.setenv(SPOTIFY_CLIENT_SECRET ="960c16acef734711b4c9ee229fa8fd31" )
+access_token <- get_spotify_access_token()
+
+
+skillet <-get_artist_audio_features('skillet')
+
+skillet%>% group_by(album_name,album_release_year) %>% select(album_name,track_name,valence,energy,danceability) %>% summarise(positividad_musical=mean(valence),nivelEnergia=mean(energy),ProbBaile=mean(danceability))
+
+bd=skillet%>% group_by(album_name,album_release_year) %>% select(album_name,track_name,valence,energy,danceability) %>% summarise(positividad_musical=mean(valence),nivelEnergia=mean(energy),ProbBaile=mean(danceability))
+
+#grafica representa el nivel de positividad musical promedio del album,y nivel de energia del album musical
+ggplot(bd,aes(album_name,positividad_musical,colour=nivelEnergia,fill=nivelEnergia))+geom_bar(stat = "identity")+ylim(0,1)+coord_flip()
+CRock=get_category_playlists("rock")
+CRock%>%select(name,tracks.total,description)
+
+
+
+
+```
+
